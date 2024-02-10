@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 /**
  *
@@ -16,7 +17,7 @@ import javax.swing.JLabel;
 public class InputForm extends javax.swing.JPanel {
 
     JLabel focusedLabel;
-    
+
     public InputForm() {
         initComponents();
     }
@@ -53,6 +54,7 @@ public class InputForm extends javax.swing.JPanel {
         lastNameField = new javax.swing.JTextField();
         maxTicketLabel = new javax.swing.JLabel();
         birthDateChooser = new com.toedter.calendar.JDateChooser();
+        minAgeLabel = new javax.swing.JLabel();
         warningLabel = new javax.swing.JLabel();
 
         validateBtn.setText("Validate");
@@ -69,6 +71,8 @@ public class InputForm extends javax.swing.JPanel {
             }
         });
 
+        titleLabel.setFont(new java.awt.Font("Gill Sans MT", 0, 18)); // NOI18N
+        titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         titleLabel.setText("LIMITED BEYONCE CONCERT");
 
         tipSlider.setMaximum(500);
@@ -116,6 +120,8 @@ public class InputForm extends javax.swing.JPanel {
         });
 
         maxTicketLabel.setText("(Max: 8)");
+
+        minAgeLabel.setText("(Minimum Age: 18)");
 
         javax.swing.GroupLayout infoPanelLayout = new javax.swing.GroupLayout(infoPanel);
         infoPanel.setLayout(infoPanelLayout);
@@ -171,7 +177,10 @@ public class InputForm extends javax.swing.JPanel {
                                         .addGap(29, 29, 29))))
                             .addGroup(infoPanelLayout.createSequentialGroup()
                                 .addComponent(birthDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())))))
+                                .addContainerGap())
+                            .addGroup(infoPanelLayout.createSequentialGroup()
+                                .addComponent(minAgeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(64, 64, 64))))))
         );
         infoPanelLayout.setVerticalGroup(
             infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -209,7 +218,9 @@ public class InputForm extends javax.swing.JPanel {
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(birthDateLabel)
                     .addComponent(birthDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(minAgeLabel)
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         warningLabel.setText("------------------------------------------------------------------------");
@@ -240,7 +251,7 @@ public class InputForm extends javax.swing.JPanel {
                 .addComponent(titleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(infoPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
                 .addComponent(warningLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -272,26 +283,42 @@ public class InputForm extends javax.swing.JPanel {
         unhighlight();
     }//GEN-LAST:event_resetBtnActionPerformed
 
+    //performs all the validation functions and returns when one of them fails
     private void validateData() {
-//        if (!checkIfHasData()) {
-//            return;
-//        }
-//        
-//        if(!checkAge()) {
-//            warning("Minimum age of 18 is required...");
-//            return;
-//        }
-//        
-//        if(!checkTicketCount()) {
-//            return;
-//        }
-        if(!checkLength(20)) {
+        //executes check for data input
+        if (!checkIfHasData()) {
             return;
         }
-        
+        //executes check for age
+        if (!checkAge()) {
+            warning("Minimum age of 18 is required...");
+            return;
+        }
+        //executes check for ticket count
+        if (!checkTicketCount()) {
+            return;
+        }
+        //executes check of length for firstname
+        if (!checkLength(firstNameLabel, firstNameField, 6)) {
+            return;
+        }
+        //executes check of length for lastname
+        if (!checkLength(lastNameLabel, lastNameField, 6)) {
+            return;
+        }
+        //executes number check for firstname
+        if (!numberCheck(firstNameLabel, firstNameField)) {
+            return;
+        }
+        //executes number check for lastname
+        if (!numberCheck(lastNameLabel, lastNameField)) {
+            return;
+        }
+        //notifies user the input is valid
         warning("Data is good");
     }
 
+    //checks if all fields have data inputted
     private boolean checkIfHasData() {
         if (birthDateChooser.getDate() == null) {
             warning("Date Of Birth is required");
@@ -313,46 +340,64 @@ public class InputForm extends javax.swing.JPanel {
             highlight(genderLabel);
             return false;
         }
-        if ((int) ticketCounter.getValue() <= 0) {
-            warning("Number of tickets cannot be zero");
-            highlight(countLabel);
-            return false;
-        }
-        return true;
-    }
-    
-    private boolean checkAge() {
-        LocalDate date = birthDateChooser.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        
-        return (LocalDate.now().getYear() - date.getYear()) >= 18;
-    }
-    
-    private boolean checkTicketCount() {
-        boolean valid = ((int) ticketCounter.getValue()) < 8;
-        
-        if(!valid) {
-            warning("Number of tickets may not exceed 8");
-        }
-        
-        return valid;
-    }
-    
-    private boolean checkLength(int length) {
-        if(firstNameField.getText().length() > length) {
-            warning("First Name cannot be longer than "+ length +" characters");
-            highlight(firstNameLabel);
-            return false;
-        }
-        
-        if(lastNameField.getText().length() > length) {
-            warning("Last Name cannot be longer than "+ length +" characters");
-            highlight(lastNameLabel);
-            return false;
-        }
-        
+
         return true;
     }
 
+    //checks if user is at least 8 years old.
+    private boolean checkAge() {
+        LocalDate date = birthDateChooser.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        return (LocalDate.now().getYear() - date.getYear()) >= 18;
+    }
+
+    //ensures the ticket count is from 1 to 8
+    private boolean checkTicketCount() {
+        boolean valid = ((int) ticketCounter.getValue()) > 0;
+
+        if (!valid) {
+            warning("You must buy at least 1 ticket");
+            highlight(countLabel);
+
+            return valid;
+        }
+
+        valid = ((int) ticketCounter.getValue()) < 8;
+
+        if (!valid) {
+            warning("Number of tickets may not exceed 8");
+            highlight(countLabel);
+        }
+
+        return valid;
+    }
+
+    //check the length of the textfield input
+    private boolean checkLength(JLabel label, JTextField field, int length) {
+        if (field.getText().length() > length) {
+            warning(label.getText() + " cannot be longer than " + length + " characters");
+            highlight(label);
+
+            return false;
+        }
+        return true;
+    }
+
+    //ensures there are no numbers in names
+    private boolean numberCheck(JLabel label, JTextField field) {
+        String text = field.getText();
+        for (char c : text.toCharArray()) {
+            if (Character.isDigit(c)) {
+                warning(label.getText() + " may not contain any digits");
+                highlight(label);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    //resets all the inputs of each field
     private void reset() {
         birthDateChooser.setDate(null);
         genderBtnGroup.clearSelection();
@@ -362,38 +407,42 @@ public class InputForm extends javax.swing.JPanel {
         typeCombo.setSelectedIndex(0);
         tipSlider.setValue(0);
         vipCheckBox.setSelected(false);
-        
+
         tipLabel(0);
         warning("");
     }
-    
-    private void highlight(JLabel label) {                
+
+    //highlight the labels where data is incorrectly entered
+    private void highlight(JLabel label) {
         focusedLabel = label;
-        
+
         label.setBackground(Color.BLUE);
         label.setOpaque(true);
         label.setForeground(Color.WHITE);
-        
+
         label.repaint();
     }
-    
+
+    //unhighligts the highlighted labels when data is resetted
     private void unhighlight() {
-        if(focusedLabel == null) {
+        if (focusedLabel == null) {
             return;
         }
-        
+
         focusedLabel.setOpaque(false);
         focusedLabel.setForeground(Color.BLACK);
-        
+
         focusedLabel.repaint();
-        
+
         focusedLabel = null;
     }
-    
+
+    //updates the value of the tip label
     private void tipLabel(int num) {
         tipCountLabel.setText("R" + num);
     }
 
+    //updates the warning label to inform the user of incorrect input
     private void warning(String warning) {
         warningLabel.setText(warning);
     }
@@ -411,6 +460,7 @@ public class InputForm extends javax.swing.JPanel {
     private javax.swing.JLabel lastNameLabel;
     private javax.swing.JRadioButton maleRadioBtn;
     private javax.swing.JLabel maxTicketLabel;
+    private javax.swing.JLabel minAgeLabel;
     private javax.swing.JButton resetBtn;
     private javax.swing.JSpinner ticketCounter;
     private javax.swing.JLabel tipCountLabel;
