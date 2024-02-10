@@ -325,6 +325,7 @@
     </Container>
     <Component class="javax.swing.JLabel" name="warningLabel">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="0"/>
         <Property name="text" type="java.lang.String" value="------------------------------------------------------------------------"/>
       </Properties>
     </Component>

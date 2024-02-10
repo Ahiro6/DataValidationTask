@@ -223,6 +223,7 @@ public class InputForm extends javax.swing.JPanel {
                 .addContainerGap(39, Short.MAX_VALUE))
         );
 
+        warningLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         warningLabel.setText("------------------------------------------------------------------------");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -292,6 +293,7 @@ public class InputForm extends javax.swing.JPanel {
         //executes check for age
         if (!checkAge()) {
             warning("Minimum age of 18 is required...");
+            highlight(birthDateLabel);
             return;
         }
         //executes check for ticket count
@@ -299,11 +301,11 @@ public class InputForm extends javax.swing.JPanel {
             return;
         }
         //executes check of length for firstname
-        if (!checkLength(firstNameLabel, firstNameField, 6)) {
+        if (!checkLength(firstNameLabel, firstNameField, 20)) {
             return;
         }
         //executes check of length for lastname
-        if (!checkLength(lastNameLabel, lastNameField, 6)) {
+        if (!checkLength(lastNameLabel, lastNameField, 20)) {
             return;
         }
         //executes number check for firstname
